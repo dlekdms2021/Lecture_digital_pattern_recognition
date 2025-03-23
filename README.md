@@ -15,4 +15,4 @@
 ### Github
 - Current repository
 - Basic practice
-- Either Python (*.py or *.ipynb) or Matlab (*.m)
+- Either Python (*.py or *.ipynb) Matlab (*.m)
