@@ -156,6 +156,56 @@ disp(size((epoch_nontarget)));
 eegplot(epoch_target, 'srate', srate, 'eloc_file', ch_locs, 'title', 'target', 'winlength', 13);
 eegplot(epoch_nontarget, 'srate', srate, 'eloc_file', ch_locs, 'title', 'nontarget', 'winlength', 13);
 
+%% Run SVD and PCA
+
+[W, Y] = pca(filt_eeg);
+figure,
+for i=1:size(filt_eeg, 1)-1
+    subplot(6,6,i);
+    topoplot(W(i, :), ch_locs);
+end
+
+eegplot(Y, 'srate', srate, 'eloc_file', ch_locs);
+
+
+% PCA: covariance matrix
+C = cov(filt_eeg');
+[Vpca, D] = eig(C);              
+[~, idx] = sort(diag(D), 'descend');
+Vpca = Vpca(:, idx);    
+D = D(idx, idx);           
+
+% SVD: filtered data
+[U, S, V] = svd(filt_eeg, 'econ');        % X = U * S * V'
+
+% First principal component
+figure;
+plot(Vpca(:,1), '-o');
+title('1st Principal Component (PCA)');
+xlabel('Channel Index');
+ylabel('Weight');
+
+% SVD
+figure;
+plot(U(:,1), '-s');
+title('1st Spatial Component (SVD)');
+xlabel('Channel Index');
+ylabel('Weight');
+
+% Select components
+k = 5;
+X_reduced = U(:,1:k) * S(1:k,1:k) * V(:,1:k)';  % 근사 복원
+
+% Origin vs. reconstructed
+figure;
+plot(1:timepoints, X(1,:), 'k', 'DisplayName','Original');
+hold on;
+plot(1:timepoints, X_reduced(1,:), 'r--', 'DisplayName','Reconstructed (5 PC)');
+legend;
+title('EEG Channel 1: Original vs PCA-Reconstructed');
+
+
+
 %% Run independent component analysis
 
 disp('Artifact removal using ICA ...');
@@ -171,7 +221,7 @@ eegplot(EEG.ics, 'srate', srate, 'winlength', 15);
 
 figure,
 for i=1:size(filt_eeg, 1)
-    subplot(8,4,i);
+    subplot(6,6,i);
     topoplot(EEG.icawinv(:,i),ch_locs); colorbar;...
         title(strcat('Components ', num2str(i))); colormap('jet')
 end
