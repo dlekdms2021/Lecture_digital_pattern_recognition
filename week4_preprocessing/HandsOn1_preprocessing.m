@@ -164,7 +164,7 @@ for i=1:size(filt_eeg, 1)-1
     subplot(6,6,i);
     topoplot(W(i, :), ch_locs);
 end
-
+eegplot(filt_eeg, 'srate', srate, 'eloc_file', ch_locs, 'title', 'target', 'winlength', 13);
 eegplot(Y, 'srate', srate, 'eloc_file', ch_locs);
 
 
@@ -197,13 +197,7 @@ k = 5;
 X_reduced = U(:,1:k) * S(1:k,1:k) * V(:,1:k)';  % 근사 복원
 
 % Origin vs. reconstructed
-figure;
-plot(1:timepoints, X(1,:), 'k', 'DisplayName','Original');
-hold on;
-plot(1:timepoints, X_reduced(1,:), 'r--', 'DisplayName','Reconstructed (5 PC)');
-legend;
-title('EEG Channel 1: Original vs PCA-Reconstructed');
-
+eegplot(filt_eeg, 'srate', srate, 'eloc_file', ch_locs, 'data2', X_reduced);
 
 
 %% Run independent component analysis
@@ -230,10 +224,10 @@ figure,
 bar(EEG.icacompvars); title('The variance of ICA Components');
 
 figure,
-subplot(2,1,1); spectopo(filt_eeg, 0, srate, 'overlap', EEG.srate/2);
+subplot(2,1,1); spectopo(filt_eeg, 0, srate, 'overlap', srate/2);
 xlim([0 70]); ylim([-20 40]); title('raw EEG spectral power -- spectopo()');
 
-subplot(2,1,2); spectopo(EEG.ics, 0, srate, 'overlap', EEG.srate/2);
+subplot(2,1,2); spectopo(EEG.ics, 0, srate, 'overlap', srate/2);
 xlim([0 70]); ylim([-20 40]); title('Components spectral power -- spectopo()');
 
 %%
