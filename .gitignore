@@ -1,5 +1,6 @@
 data/
 external_libs/
 .DS_Store
+results/
 
 *.asv
