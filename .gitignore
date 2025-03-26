@@ -2,5 +2,6 @@ data/
 external_libs/
 .DS_Store
 results/
+Instructor/
 
 *.asv
