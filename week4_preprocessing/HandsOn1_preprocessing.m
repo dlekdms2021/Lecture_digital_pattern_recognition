@@ -142,7 +142,13 @@ tmp_nontarget = event_markers;
 tmp_nontarget(tmp_nontarget==1) = 0; % remove target merkers
 tmp_nontarget = sign(tmp_nontarget);
 
-filt_eeg = ft_preproc_bandpassfilter(data_untouched, srate, Params_P3speller.freq, 4, 'but');
+wn = Params_P3speller.freq / (srate/2);
+[b, a] = butter(4, wn, 'bandpass');
+% demean the data before filtering
+meandat = mean(data_untouched, 2);
+data_untouched = bsxfun(@minus, data_untouched, meandat);
+filt_eeg = filtfilt(b, a, data_untouched')';
+
 
 epoch_target = eeg_extract_epochs(filt_eeg, srate, tmp_target, Params_P3speller.frame);
 epoch_nontarget = eeg_extract_epochs(filt_eeg, srate, tmp_nontarget, Params_P3speller.frame);
