@@ -209,31 +209,27 @@ eegplot(filt_eeg, 'srate', srate, 'eloc_file', ch_locs, 'data2', X_reduced);
 %% Run independent component analysis
 
 disp('Artifact removal using ICA ...');
-    
-[EEG.icaweights, EEG.icasphere, EEG.icacompvars, EEG.icabias, EEG.signs, ...
-    EEG.lrates, EEG.icaact] = runica(filt_eeg, 'extended', 1);
+% Y = Ax
+ica = [];
+[ica.weights, ica.sphere] = runica(filt_eeg, 'extended', 1);
+ica.unmix = ica.weights * ica.sphere;
+ica.winv = inv(ica.unmix); % A hat (weight inverse)
+ica.ics = ica.unmix * filt_eeg;
+% estimated sources: ica.ics = ica.weights * ica.sphere * X
 
-EEG.unmix = EEG.icaweights * EEG.icasphere;
-EEG.icawinv  = inv(EEG.unmix); % weight inverse
-EEG.ics = EEG.unmix  * filt_eeg;
-
-eegplot(EEG.ics, 'srate', srate, 'winlength', 15);
-
+eegplot(ica.ics, 'srate', srate, 'winlength', 15);
 figure,
 for i=1:size(filt_eeg, 1)
     subplot(6,6,i);
-    topoplot(EEG.icawinv(:,i),ch_locs); colorbar;...
+    topoplot(ica.winv(:,i),ch_locs); colorbar;...
         title(strcat('Components ', num2str(i))); colormap('jet')
 end
-
-figure,
-bar(EEG.icacompvars); title('The variance of ICA Components');
 
 figure,
 subplot(2,1,1); spectopo(filt_eeg, 0, srate, 'overlap', srate/2);
 xlim([0 70]); ylim([-20 40]); title('raw EEG spectral power -- spectopo()');
 
-subplot(2,1,2); spectopo(EEG.ics, 0, srate, 'overlap', srate/2);
+subplot(2,1,2); spectopo(ica.ics, 0, srate, 'overlap', srate/2);
 xlim([0 70]); ylim([-20 40]); title('Components spectral power -- spectopo()');
 
 %%
@@ -241,11 +237,9 @@ xlim([0 70]); ylim([-20 40]); title('Components spectral power -- spectopo()');
 reject_set = input('Please type \nEEG ICA componets that you want to reject: ', 's');
 reject_idx = str2num(reject_set);
 
-EEG.mask_icawinv = EEG.icawinv;
-
-EEG.mask_icawinv(:, reject_idx) = 0;
-BP1 = EEG.mask_icawinv * EEG.ics;
-clean_data = BP1;
+ica.mask_winv = ica.icawinv;
+ica.mask_winv(:, reject_idx) = 0;
+clean_data = ica.mask_winv * ica.ics;
 
 eegplot(filt_eeg, 'data2', clean_data, 'srate', srate, 'winlength', 10, ...
     'title', 'Black = channel before rejection; red = after rejection -- eegplot()', ...
