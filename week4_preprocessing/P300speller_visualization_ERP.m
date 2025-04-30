@@ -22,7 +22,7 @@ electrodes_midline = {'FZ', 'Cz', 'Pz'};
 electrodes_eyes = {'FP1', 'FP2', 'AF3', 'AF4'};
 
 for nsb=1
-    fname_train = sprintf('./data/s%02d.mat', nsb);
+    fname_train = sprintf('../data/P300spellerdataset/s%02d.mat', nsb);
     EEG = load(fname_train);
     eeg_test = EEG.test;
     
@@ -70,7 +70,7 @@ grand_target = [];
 grand_nontarget =[];
 
 for nsb=1:nbsub
-    fname = sprintf('./data/s%02d.mat', nsb);
+    fname = sprintf('../data/P300spellerdataset/s%02d.mat', nsb);
     EEG = load(fname);
     fprintf('Loading %s..\n', fname);
     eeg_test = EEG.test;

@@ -19,7 +19,7 @@ if strcmpi(opt, 'unknown')
     % channel select
     rmbase_unknown = rmbase_unknown(params.select_ch, :);
     % output dim: [ch x (time x trials)]
-    
+
     % decimation for smoothing
     % -- replacing each sequence of 24 samples with their average
     % (Krusienski et al., 2006)
@@ -47,7 +47,7 @@ else
     rmbase_target = rmbase_target(params.select_ch, :);
     rmbase_nontarget = rmbase_nontarget(params.select_ch, :);
     % output dim: [ch x (time x trials)]
-    
+   
     % decimation for smoothing
     % -- replacing each sequence of 24 samples with their average
     % (Krusienski et al., 2006)

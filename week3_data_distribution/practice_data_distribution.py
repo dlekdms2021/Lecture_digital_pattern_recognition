@@ -20,7 +20,7 @@ from statsmodels.stats.anova import AnovaRM
 from statsmodels.stats.anova import anova_lm
 
 # Display plots in a separate window (pyqt)
-%matplotlib qt
+# %matplotlib qt
 
 #%% Load toy datasets from sickit-learn
 plt.close("all")
